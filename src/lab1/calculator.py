@@ -20,6 +20,10 @@ while s != "Stop":
         try:
             a = eval(s)
             print((a // 10**-11) * 10**-11)
+        except NameError:
+            print("Выражение введено неверно")
+        except TypeError:
+            print("Выражение введено неверно")
         except SyntaxError:
             print("Выражение введено неверно")
         except ZeroDivisionError:

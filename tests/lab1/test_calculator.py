@@ -1,4 +1,5 @@
 import unittest
+from math import cos, log, pi, sin, sqrt, tan
 
 
 class Calculator:

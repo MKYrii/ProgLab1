@@ -1,27 +1,6 @@
 import unittest
 from math import cos, log, pi, sin, sqrt, tan
-
-
-class Calculator:
-    """без этих строк pylint отнимает 1.28 балла"""
-
-    A = 0
-
-    """без этих строк pylint отнимает 1.28 балла"""
-
-    def main(self, s_ss):
-        """без этих строк pylint отнимает 1.28 балла"""
-        try:
-            a_aa = eval(s_ss)
-            return str(a_aa)
-        except NameError:
-            return "Выражение введено неверно"
-        except TypeError:
-            return "Выражение введено неверно"
-        except SyntaxError:
-            return "Выражение введено неверно"
-        except ZeroDivisionError:
-            return "Деление на 0"
+from src.lab1.calculator import Calculator
 
 
 class TestCalculator(unittest.TestCase):

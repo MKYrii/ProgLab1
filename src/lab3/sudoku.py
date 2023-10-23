@@ -1,6 +1,10 @@
 import pathlib
 import typing as tp
+import sys
+import random
 
+
+sys.setrecursionlimit(10000)
 T = tp.TypeVar("T")
 
 
@@ -41,7 +45,10 @@ def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
     >>> group([1,2,3,4,5,6,7,8,9], 3)
     [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
     """
-    pass
+    new_list = []
+    for i in range(n):
+        new_list.append([values[n * i + j] for j in range(n)])
+    return new_list
 
 
 def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -53,7 +60,7 @@ def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
     >>> get_row([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (2, 0))
     ['.', '8', '9']
     """
-    pass
+    return grid[pos[0]]
 
 
 def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -65,7 +72,10 @@ def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
     >>> get_col([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (0, 2))
     ['3', '6', '9']
     """
-    pass
+    ans = []
+    for i in grid:
+        ans.append(i[pos[1]])
+    return ans
 
 
 def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
@@ -78,7 +88,12 @@ def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[s
     >>> get_block(grid, (8, 8))
     ['2', '8', '.', '.', '.', '5', '.', '7', '9']
     """
-    pass
+    ans = []
+    p, q = pos[0] - pos[0] % 3, pos[1] - pos[1] % 3
+    for i in range(3):
+        for j in range(3):
+            ans.append(grid[p + i][q + j])
+    return ans
 
 
 def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[int, int]]:
@@ -90,7 +105,11 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
     >>> find_empty_positions([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']])
     (2, 0)
     """
-    pass
+    for i in range(len(grid)):
+        for j in range(len(grid[i])):
+            if grid[i][j] == '.':
+                return i, j
+    return -1, -1
 
 
 def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
@@ -103,7 +122,12 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     >>> values == {'2', '5', '9'}
     True
     """
-    pass
+    possible = []
+    for i in range(1, 10):
+        i = str(i)
+        if (i not in get_row(grid, pos)) and (i not in get_col(grid, pos)) and (i not in get_block(grid, pos)):
+            possible.append(i)
+    return set(possible)
 
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
@@ -118,13 +142,48 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     >>> solve(grid)
     [['5', '3', '4', '6', '7', '8', '9', '1', '2'], ['6', '7', '2', '1', '9', '5', '3', '4', '8'], ['1', '9', '8', '3', '4', '2', '5', '6', '7'], ['8', '5', '9', '7', '6', '1', '4', '2', '3'], ['4', '2', '6', '8', '5', '3', '7', '9', '1'], ['7', '1', '3', '9', '2', '4', '8', '5', '6'], ['9', '6', '1', '5', '3', '7', '2', '8', '4'], ['2', '8', '7', '4', '1', '9', '6', '3', '5'], ['3', '4', '5', '2', '8', '6', '1', '7', '9']]
     """
-    pass
+    if find_empty_positions(grid)[0] == -1:
+        return grid
+    elif len(find_possible_values(grid, find_empty_positions(grid))) == 0:
+        return False
+    else:
+        cnt = 0
+        for i in grid:
+            for j in i:
+                if j == '.':
+                    cnt += 1
+        x, y = find_empty_positions(grid)
+        for i in find_possible_values(grid, (x, y)):
+
+            g = []
+            for j in range(len(grid)):
+                j1 = []
+                for k in range(len(grid[j])):
+                    j1.append(grid[j][k])  # копируем массив grid
+                g.append(j1)
+
+            g[x][y] = i
+            ans = solve(g)
+            if ans:
+                return ans
+    return False
 
 
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     """ Если решение solution верно, то вернуть True, в противном случае False """
     # TODO: Add doctests with bad puzzles
-    pass
+    ans = True
+    for i in range(len(solution)):
+        for j in range(len(solution[i])):
+            row = get_row(solution, (i, j))
+            col = get_col(solution, (i, j))
+            block = get_block(solution, (i, j))
+            for nums in row, col, block:
+                for elem in nums:
+                    if nums.count(elem) > 1:
+                        ans = False
+                        break
+    return ans
 
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
@@ -148,13 +207,38 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     >>> check_solution(solution)
     True
     """
-    pass
+    grid = read_sudoku("base.txt")
+    k1 = random.randint(1, 15)
+    for i in range(k1):
+        k2 = random.randint(1, 3)
+        if k2 == 1:
+            grid = list(map(list, zip(*grid)))
+        elif k2 == 2:
+            row = random.randint(0, 6)
+            while row % 3 != 0:
+                row = random.randint(0, 6)
+            for i in range(9):
+                grid[row][i], grid[row + 2][i] = grid[row + 2][i], grid[row][i]
+        elif k2 == 3:
+            col = random.randint(0, 6)
+            while col % 3 != 0:
+                col = random.randint(0, 6)
+            for i in range(9):
+                grid[i][col], grid[i][col + 2] = grid[i][col + 2], grid[i][col]
+    k = 81
+    while k > max(0, N):
+        x, y = random.randint(0, 8), random.randint(0, 8)
+        if grid[x][y] != '.':
+            k -= 1
+            grid[x][y] = '.'
+    return grid
 
 
 if __name__ == "__main__":
     for fname in ["puzzle1.txt", "puzzle2.txt", "puzzle3.txt"]:
         grid = read_sudoku(fname)
         display(grid)
+        solved = False
         solution = solve(grid)
         if not solution:
             print(f"Puzzle {fname} can't be solved")

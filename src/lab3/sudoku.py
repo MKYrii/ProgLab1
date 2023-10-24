@@ -172,6 +172,8 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     """ Если решение solution верно, то вернуть True, в противном случае False """
     # TODO: Add doctests with bad puzzles
+    if find_empty_positions(solution)[0] != -1:
+        return False
     ans = True
     for i in range(len(solution)):
         for j in range(len(solution[i])):

@@ -209,7 +209,7 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     >>> check_solution(solution)
     True
     """
-    grid = read_sudoku("base.txt")
+    grid = create_grid('123456789\n456789123\n789123456\n234567891\n567891234\n891234567\n345678912\n678912345\n912345678')
     k1 = random.randint(1, 15)
     for i in range(k1):
         k2 = random.randint(1, 3)

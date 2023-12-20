@@ -17,8 +17,6 @@ class Recommendation:
 
     def get_new_film(self, watched_films):
         watched_films = ''.join(watched_films)
-        cnt_watched_films = [0 for i in range(len(self.users))]
-        cnt_recommend_films = [0 for i in range(len(self.films))]
         recommended_users = ''
         for user in self.users:
             user_films = ''.join(user)
